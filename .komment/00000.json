@@ -1,0 +1,346 @@
+[
+  {
+    "name": "civitAI_Model_downloader.py",
+    "path": "civitAI_Model_downloader.py",
+    "content": {
+      "structured": {
+        "description": "A script that processes a list of usernames and downloads models for each username based on a specified download type. It utilizes the `requests` and `tqdm` libraries to manage API requests and display progress bar, respectively. The script retrieves summary data for each username, calculates the total number of items, downloaded items, intentionally skipped items, and failed items. Finally, it processes each username in the list by downloading models based on the specified download type, which can be 'All', 'Lora', 'Checkpoints', 'Embeddings', 'Training_Data', or 'Other'.",
+        "items": [
+          {
+            "id": "f48f1738-2662-76bb-0445-e5d930488dc5",
+            "ancestors": [],
+            "description": "Reads and processes summary data from a text file, updating a dictionary with counts for different categories.",
+            "params": [
+              {
+                "name": "username",
+                "type_name": "str",
+                "description": "Used to specify the username for which summary data is being read."
+              }
+            ],
+            "returns": {
+              "type_name": "dict",
+              "description": "A collection of category name and corresponding count."
+            },
+            "name": "read_summary_data",
+            "location": {
+              "start": 74,
+              "insert": 75,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 74,
+                "end": 75
+              }
+            },
+            "item_type": "function",
+            "length": 15,
+            "docLength": 1
+          },
+          {
+            "id": "587cef32-e337-d4b4-f144-16bf5358df74",
+            "ancestors": [],
+            "description": "Modifies a given name to make it suitable for use as a file or folder name. It replaces certain characters with underscores and checks for reserved names, before renaming the base name to fit within a maximum length.",
+            "params": [
+              {
+                "name": "name",
+                "type_name": "str",
+                "description": "Passed as input to the function, representing the name that needs to be sanitized."
+              },
+              {
+                "name": "folder_name",
+                "type_name": "str",
+                "description": "Used to replace parts of the input name with underscores, with the intention of avoiding reserved names or conflicting with existing folder names."
+              },
+              {
+                "name": "max_length",
+                "type_name": "int",
+                "description": "Used to limit the length of the base name when combining it with the extension."
+              },
+              {
+                "name": "subfolder",
+                "type_name": "str",
+                "description": "Used to specify a subfolder for the output file path."
+              },
+              {
+                "name": "output_dir",
+                "type_name": "str",
+                "description": "Used to join the username, subfolder, and output directory to form a unique name for the file."
+              },
+              {
+                "name": "username",
+                "type_name": "str",
+                "description": "Used to specify the username for which the name will be sanitized, if present."
+              }
+            ],
+            "returns": {
+              "type_name": "str",
+              "description": "A sanitized name that follows naming conventions for a file or folder name."
+            },
+            "name": "sanitize_name",
+            "location": {
+              "start": 91,
+              "insert": 92,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 91,
+                "end": 92
+              }
+            },
+            "item_type": "function",
+            "length": 24,
+            "docLength": 1
+          },
+          {
+            "id": "c8f27d3d-2303-b891-3d48-d43a90c00f6c",
+            "ancestors": [],
+            "description": "Downloads a file or image from a URL, retrying if necessary due to errors. It checks if the file already exists, creates the directory if necessary, and uses `tqdm` to display a progress bar during the download. If the download succeeds, it returns `True`.",
+            "params": [
+              {
+                "name": "url",
+                "type_name": "str",
+                "description": "Passed as the URL of the file or image to be downloaded."
+              },
+              {
+                "name": "output_path",
+                "type_name": "str",
+                "description": "Used to specify the path where the downloaded file will be saved."
+              },
+              {
+                "name": "retry_count",
+                "type_name": "int",
+                "description": "Used to keep track of the number of retries made when downloading a file or image from a URL. It starts at 0 and increments each time there is an error during download, up to a maximum of `max_retries`."
+              },
+              {
+                "name": "max_retries",
+                "type_name": "int",
+                "description": "Maximum number of attempts to download the file before giving up."
+              }
+            ],
+            "returns": {
+              "type_name": "OptionalTrue",
+              "description": "Either True if the file was downloaded successfully or False otherwise."
+            },
+            "name": "download_file_or_image",
+            "location": {
+              "start": 122,
+              "insert": 123,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 122,
+                "end": 123
+              }
+            },
+            "item_type": "function",
+            "length": 54,
+            "docLength": 1
+          },
+          {
+            "id": "a5b1bdc4-d7b5-0f9c-394d-f0e7eec53db4",
+            "ancestors": [],
+            "description": "Downloads files and images associated with a given model from a server, creating directories for each item if necessary, and storing the downloaded content in a sanitized format.",
+            "params": [
+              {
+                "name": "item_name",
+                "type_name": "str",
+                "description": "Used to specify the name of an item in the Civitai platform, which can be a model file or image."
+              },
+              {
+                "name": "model_version",
+                "type_name": "objectdict",
+                "description": "Used to store information about the mode being downloaded, such as its files, images, and version number."
+              },
+              {
+                "name": "item",
+                "type_name": "dict",
+                "description": "Passed as an argument to the function. It contains information about the item for which files are to be downloaded, including its name, model version, and other relevant details."
+              },
+              {
+                "name": "download_type",
+                "type_name": "str",
+                "description": "Used to specify the type of files to download, with values 'All', 'Training_Data', 'Lora', or a subfolder of 'Lora'."
+              },
+              {
+                "name": "failed_downloads_file",
+                "type_name": "open",
+                "description": "Used to write failed download logs to file."
+              }
+            ],
+            "returns": {
+              "type_name": "3element",
+              "description": "A tuple containing the following items:\n\n1. `item_name`: The name of the item downloaded.\n2. `downloaded`: A boolean indicating whether the download was successful.\n3. `model_images`: A dictionary containing the images downloaded for the model."
+            },
+            "name": "download_model_files",
+            "location": {
+              "start": 179,
+              "insert": 180,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 179,
+                "end": 180
+              }
+            },
+            "item_type": "function",
+            "length": 109,
+            "docLength": 1
+          },
+          {
+            "id": "405b88ba-3821-228b-1a43-3185978e0e65",
+            "ancestors": [],
+            "description": "Processes a given username by downloading and counting files of various types, skipping some and failing if necessary, and providing total and downloaded counts for each type.",
+            "params": [
+              {
+                "name": "username",
+                "type_name": "str",
+                "description": "Used to identify the specific user whose data is being processed."
+              },
+              {
+                "name": "download_type",
+                "type_name": "str",
+                "description": "Used to specify the type of files to download, which can be either 'All', 'Lora', 'Checkpoints', 'Embeddings', 'Training_Data', or 'Other'."
+              }
+            ],
+            "returns": null,
+            "name": "process_username",
+            "location": {
+              "start": 290,
+              "insert": 291,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 290,
+                "end": 291
+              }
+            },
+            "item_type": "function",
+            "length": 97,
+            "docLength": 1
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "fetch_all_models.py",
+    "path": "fetch_all_models.py",
+    "content": {
+      "structured": {
+        "description": "Three functions: `categorize_item`, `search_for_training_data_files`, and `fetch_all_models`. The `categorize_item` function takes an item as input and categorizes it based on its JSON type. The `search_for_training_data_files` function searches for files with the \"Training Data\" type within a model's versions. The `fetch_all_models` function fetches all models from an API and categorizes them based on their type, including checkpoints, embeddings, Lora, training data, and other items.",
+        "items": [
+          {
+            "id": "c96d2d95-c9e6-f1ba-974a-94e1d0830d73",
+            "ancestors": [],
+            "description": "Takes an item as input and returns a category label based on the value of the `type` field in the item's dictionary. The function can categorize items into five categories: 'Checkpoints', 'Embeddings', 'Lora', 'Training Data', or 'Other'.",
+            "params": [
+              {
+                "name": "item",
+                "type_name": "Item",
+                "description": "Passed as an instance of the Item class, providing information such as \"type\" and \"name\"."
+              }
+            ],
+            "returns": {
+              "type_name": "str",
+              "description": "Determined by analyzing the values of two attributes of an item, specifically `item_type` and `file_name`."
+            },
+            "name": "categorize_item",
+            "location": {
+              "start": 12,
+              "insert": 13,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 12,
+                "end": 13
+              }
+            },
+            "item_type": "function",
+            "length": 14,
+            "docLength": 1
+          },
+          {
+            "id": "43fde1f1-fd97-d8a3-0e4a-a69ffbcd6618",
+            "ancestors": [],
+            "description": "Searches for training data files based on their file names and types, appending the found files to a list called `training_data_files`.",
+            "params": [
+              {
+                "name": "item",
+                "type_name": "dict",
+                "description": "Passed as a reference to the function."
+              }
+            ],
+            "returns": {
+              "type_name": "list",
+              "description": "A list of strings representing the names of training data files."
+            },
+            "name": "search_for_training_data_files",
+            "location": {
+              "start": 28,
+              "insert": 29,
+              "offset": " ",
+              "indent": 4,
+              "comment": {
+                "start": 28,
+                "end": 29
+              }
+            },
+            "item_type": "function",
+            "length": 8,
+            "docLength": 1
+          },
+          {
+            "id": "065f0877-5b5e-088b-c845-ee93e43ee23e",
+            "ancestors": [],
+            "description": "Retrieves and categorizes models from Civitai API based on their category, returning a summary and detailed listing of the models.",
+            "params": [
+              {
+                "name": "token",
+                "type_name": "str",
+                "description": "Used to make API requests to Civitai's model repository."
+              },
+              {
+                "name": "username",
+                "type_name": "str",
+                "description": "Used to filter the API response based on the user's username."
+              }
+            ],
+            "returns": {
+              "type_name": "dict",
+              "description": "A list of dictionaries, where each dictionary represents a category of model (e.g., Checkpoints, Embeddings, Lora, Training Data, and Other) containing lists of model names."
+            },
+            "name": "fetch_all_models",
+            "location": {
+              "start": 38,
+              "insert": 39,
+              "offset": " ",
+              "indent": 4,
+              "comment": null
+            },
+            "item_type": "function",
+            "length": 60,
+            "docLength": null
+          },
+          {
+            "id": "50e3699e-946c-ebb8-0b4c-d3aa7275fd05",
+            "ancestors": [],
+            "description": "Defines an `argparse` parser to handle command-line arguments, then calls the `fetch_all_models` function with the API token and username provided by the user.",
+            "params": [],
+            "returns": null,
+            "name": "main",
+            "location": {
+              "start": 103,
+              "insert": 104,
+              "offset": " ",
+              "indent": 4,
+              "comment": null
+            },
+            "item_type": "function",
+            "length": 7,
+            "docLength": null
+          }
+        ]
+      }
+    }
+  }
+]
