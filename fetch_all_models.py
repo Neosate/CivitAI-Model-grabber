@@ -10,7 +10,20 @@ logging.basicConfig(filename=file_path, level=logging.ERROR, format='%(asctime)s
 logger = logging.getLogger(__name__)
 
 def categorize_item(item):
-    """Categorize the item based on JSON type."""
+    """
+    Takes an item as input and returns a category label based on the value of the
+    `type` field in the item's dictionary. The function can categorize items into
+    five categories: 'Checkpoints', 'Embeddings', 'Lora', 'Training Data', or 'Other'.
+
+    Args:
+        item (Item): Passed as an instance of the Item class, providing information
+            such as "type" and "name".
+
+    Returns:
+        str: Determined by analyzing the values of two attributes of an item,
+        specifically `item_type` and `file_name`.
+
+    """
     item_type = item.get("type", "").upper()
     file_name = item.get("name", "")
 
@@ -26,7 +39,17 @@ def categorize_item(item):
         return 'Other'
 
 def search_for_training_data_files(item):
-    """Search for files with type 'Training Data' in the item's model versions."""
+    """
+    Searches for training data files based on their file names and types, appending
+    the found files to a list called `training_data_files`.
+
+    Args:
+        item (dict): Passed as a reference to the function.
+
+    Returns:
+        list: A list of strings representing the names of training data files.
+
+    """
     training_data_files = []
     model_versions = item.get("modelVersions", [])
     for version in model_versions:
@@ -36,6 +59,20 @@ def search_for_training_data_files(item):
     return training_data_files
 
 def fetch_all_models(token, username):
+    """
+    Retrieves and categorizes models from Civitai API based on their category,
+    returning a summary and detailed listing of the models.
+
+    Args:
+        token (str): Used to make API requests to Civitai's model repository.
+        username (str): Used to filter the API response based on the user's username.
+
+    Returns:
+        dict: A list of dictionaries, where each dictionary represents a category
+        of model (e.g., Checkpoints, Embeddings, Lora, Training Data, and Other)
+        containing lists of model names.
+
+    """
     base_url = "https://civitai.com/api/v1/models"
     categorized_items = {
         'Checkpoints': [],
@@ -101,6 +138,11 @@ def fetch_all_models(token, username):
     return categorized_items
 
 def main():
+    """
+    Defines an `argparse` parser to handle command-line arguments, then calls the
+    `fetch_all_models` function with the API token and username provided by the user.
+
+    """
     parser = argparse.ArgumentParser(description="Fetch and categorize models.")
     parser.add_argument("--token", type=str, help="API token.")
     parser.add_argument("--username", type=str, help="Username to fetch models for.")

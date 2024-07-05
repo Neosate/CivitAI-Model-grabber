@@ -72,7 +72,18 @@ else:
             print("Invalid download type. Please try again.")
 
 def read_summary_data(username):
-    """Read summary data from a file."""
+    """
+    Reads and processes summary data from a text file, updating a dictionary with
+    counts for different categories.
+
+    Args:
+        username (str): Used to specify the username for which summary data is
+            being read.
+
+    Returns:
+        dict: A collection of category name and corresponding count.
+
+    """
     summary_path = os.path.join(SCRIPT_DIR, f"{username}.txt")
     data = {}
     try:
@@ -89,7 +100,30 @@ def read_summary_data(username):
     return data
 
 def sanitize_name(name, folder_name=None, max_length=MAX_PATH_LENGTH, subfolder=None, output_dir=None, username=None):
-    """Sanitize a name for use as a file or folder name."""
+    """
+    Modifies a given name to make it suitable for use as a file or folder name.
+    It replaces certain characters with underscores and checks for reserved names,
+    before renaming the base name to fit within a maximum length.
+
+    Args:
+        name (str): Passed as input to the function, representing the name that
+            needs to be sanitized.
+        folder_name (str): Used to replace parts of the input name with underscores,
+            with the intention of avoiding reserved names or conflicting with
+            existing folder names.
+        max_length (int): Used to limit the length of the base name when combining
+            it with the extension.
+        subfolder (str): Used to specify a subfolder for the output file path.
+        output_dir (str): Used to join the username, subfolder, and output directory
+            to form a unique name for the file.
+        username (str): Used to specify the username for which the name will be
+            sanitized, if present.
+
+    Returns:
+        str: A sanitized name that follows naming conventions for a file or folder
+        name.
+
+    """
     base_name, extension = os.path.splitext(name)
 
     if folder_name and base_name == folder_name:
@@ -120,7 +154,27 @@ def sanitize_name(name, folder_name=None, max_length=MAX_PATH_LENGTH, subfolder=
 
 
 def download_file_or_image(url, output_path, retry_count=0, max_retries=max_tries):
-    """Download a file or image from the provided URL."""
+    """
+    Downloads a file or image from a URL, retrying if necessary due to errors. It
+    checks if the file already exists, creates the directory if necessary, and
+    uses `tqdm` to display a progress bar during the download. If the download
+    succeeds, it returns `True`.
+
+    Args:
+        url (str): Passed as the URL of the file or image to be downloaded.
+        output_path (str): Used to specify the path where the downloaded file will
+            be saved.
+        retry_count (int): Used to keep track of the number of retries made when
+            downloading a file or image from a URL. It starts at 0 and increments
+            each time there is an error during download, up to a maximum of `max_retries`.
+        max_retries (int): Maximum number of attempts to download the file before
+            giving up.
+
+    Returns:
+        OptionalTrue: Either True if the file was downloaded successfully or False
+        otherwise.
+
+    """
     # Check if the file already exists
     if os.path.exists(output_path):
         return False
@@ -177,7 +231,32 @@ def download_file_or_image(url, output_path, retry_count=0, max_retries=max_trie
     return True
 
 def download_model_files(item_name, model_version, item, download_type, failed_downloads_file):
-    """Download related image and model files for each model version."""
+    """
+    Downloads files and images associated with a given model from a server, creating
+    directories for each item if necessary, and storing the downloaded content in
+    a sanitized format.
+
+    Args:
+        item_name (str): Used to specify the name of an item in the Civitai platform,
+            which can be a model file or image.
+        model_version (objectdict): Used to store information about the mode being
+            downloaded, such as its files, images, and version number.
+        item (dict): Passed as an argument to the function. It contains information
+            about the item for which files are to be downloaded, including its
+            name, model version, and other relevant details.
+        download_type (str): Used to specify the type of files to download, with
+            values 'All', 'Training_Data', 'Lora', or a subfolder of 'Lora'.
+        failed_downloads_file (open): Used to write failed download logs to file.
+
+    Returns:
+        3element: A tuple containing the following items:
+        
+        1/ `item_name`: The name of the item downloaded.
+        2/ `downloaded`: A boolean indicating whether the download was successful.
+        3/ `model_images`: A dictionary containing the images downloaded for the
+        model.
+
+    """
     files = model_version.get('files', [])
     images = model_version.get('images', [])
     downloaded = False
@@ -288,7 +367,18 @@ def download_model_files(item_name, model_version, item, download_type, failed_d
     return item_name, downloaded, model_images
 
 def process_username(username, download_type):
-    """Process a username and download the specified type of content."""
+    """
+    Processes a given username by downloading and counting files of various types,
+    skipping some and failing if necessary, and providing total and downloaded
+    counts for each type.
+
+    Args:
+        username (str): Used to identify the specific user whose data is being processed.
+        download_type (str): Used to specify the type of files to download, which
+            can be either 'All', 'Lora', 'Checkpoints', 'Embeddings', 'Training_Data',
+            or 'Other'.
+
+    """
     print(f"Processing username: {username}, Download type: {download_type}")
     fetch_user_data = fetch_all_models(token, username)
     summary_data = read_summary_data(username)
